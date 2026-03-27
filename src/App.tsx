@@ -8,6 +8,8 @@ import { MapPin, Phone, Mail, MessageSquare, Truck, HardHat, Package, ShieldChec
 import { db } from './firebase';
 import { collection, addDoc } from 'firebase/firestore';
 
+// Nominal change to test Firebase Hosting deployment via GitHub Actions
+
 export default function App() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
