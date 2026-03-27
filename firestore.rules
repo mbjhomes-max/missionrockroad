@@ -1,0 +1,52 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "mbjhomes@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidLead(data) {
+      return data.keys().hasAll(['name', 'phone', 'storing', 'space', 'createdAt', 'date']) &&
+             data.keys().hasOnly(['name', 'company', 'phone', 'email', 'storing', 'space', 'createdAt', 'date']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 200 &&
+             data.phone is string && data.phone.size() > 0 && data.phone.size() < 50 &&
+             (!('email' in data) || (data.email is string && data.email.size() > 0 && data.email.size() < 100)) &&
+             (!('company' in data) || (data.company is string && data.company.size() > 0 && data.company.size() < 200)) &&
+             data.storing is string && data.storing.size() > 0 && data.storing.size() < 50 &&
+             data.space is string && data.space.size() > 0 && data.space.size() < 50 &&
+             data.createdAt is string && data.createdAt.size() > 0 &&
+             data.date is string && data.date.size() > 0;
+    }
+
+    function isValidEmailTrigger(data) {
+      return data.keys().hasAll(['to', 'message']) &&
+             data.to is list && data.to.size() > 0 && data.to.size() <= 5 &&
+             data.message is map && data.message.keys().hasAll(['subject', 'html']) &&
+             data.message.subject is string && data.message.subject.size() > 0 && data.message.subject.size() < 300 &&
+             data.message.html is string && data.message.html.size() > 0 && data.message.html.size() < 5000;
+    }
+
+    match /leads/{leadId} {
+      allow create: if isValidLead(request.resource.data);
+      allow read, delete: if isAdmin();
+      allow update: if false; // Leads are immutable
+    }
+
+    match /mail/{mailId} {
+      allow create: if isValidEmailTrigger(request.resource.data);
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read, write: if isAdmin() || (isAuthenticated() && request.auth.uid == userId);
+    }
+  }
+}

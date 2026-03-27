@@ -1,0 +1,47 @@
+{
+  "entities": {
+    "Lead": {
+      "title": "Lead",
+      "description": "A storage request lead",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Full Name" },
+        "company": { "type": "string", "description": "Company Name" },
+        "phone": { "type": "string", "description": "Phone Number" },
+        "email": { "type": "string", "description": "Email Address" },
+        "storing": { "type": "string", "description": "What are you storing?" },
+        "space": { "type": "string", "description": "Space Required" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Submission time" },
+        "date": { "type": "string", "description": "Submission date (YYYY-MM-DD)" }
+      },
+      "required": ["name", "phone", "storing", "space", "createdAt", "date"]
+    },
+    "Mail": {
+      "title": "Mail",
+      "description": "Trigger Email extension document",
+      "type": "object",
+      "properties": {
+        "to": { "type": "array", "items": { "type": "string" }, "description": "Recipient email addresses" },
+        "message": {
+          "type": "object",
+          "properties": {
+            "subject": { "type": "string", "description": "Email subject" },
+            "html": { "type": "string", "description": "Email HTML body" }
+          },
+          "required": ["subject", "html"]
+        }
+      },
+      "required": ["to", "message"]
+    }
+  },
+  "firestore": {
+    "/leads/{leadId}": {
+      "schema": "Lead",
+      "description": "Storage request leads"
+    },
+    "/mail/{mailId}": {
+      "schema": "Mail",
+      "description": "Trigger Email queue"
+    }
+  }
+}
