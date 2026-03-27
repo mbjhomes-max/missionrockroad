@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { MapPin, Phone, Mail, MessageSquare, Truck, HardHat, Package, ShieldCheck, Clock, FileText, Anchor } from 'lucide-react';
 import { db } from './firebase';
 import { collection, addDoc } from 'firebase/firestore';
+import { backgroundImage } from './backgroundImage';
 
 // Nominal change to test Firebase Hosting deployment via GitHub Actions
 
@@ -97,7 +98,7 @@ export default function App() {
         {/* Background Image with Overlay */}
         <div className="absolute inset-0">
           <img
-            src="/Gemini_Generated_Image_stzci4stzci4stzc.webp"
+            src={backgroundImage}
             alt="Shipping container yard"
             className="w-full h-full object-cover opacity-40"
             referrerPolicy="no-referrer"
