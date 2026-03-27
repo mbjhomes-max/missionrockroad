@@ -95,7 +95,7 @@ export default function App() {
         {/* Background Image with Overlay */}
         <div className="absolute inset-0">
           <img
-            src="/Gemini_Generated_Image_stzci4stzci4stzc.png"
+            src="/Gemini_Generated_Image_stzci4stzci4stzc.webp"
             alt="Shipping container yard"
             className="w-full h-full object-cover opacity-40"
             referrerPolicy="no-referrer"
