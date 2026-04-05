@@ -6,15 +6,15 @@
       "type": "object",
       "properties": {
         "name": { "type": "string", "description": "Full Name" },
-        "company": { "type": "string", "description": "Company Name" },
         "phone": { "type": "string", "description": "Phone Number" },
         "email": { "type": "string", "description": "Email Address" },
-        "storing": { "type": "string", "description": "What are you storing?" },
-        "space": { "type": "string", "description": "Space Required" },
+        "storageNeeds": { "type": "string", "description": "Storage Needs" },
+        "userType": { "type": "string", "description": "User Type" },
+        "inquiry": { "type": "string", "description": "Optional Inquiry" },
         "createdAt": { "type": "string", "format": "date-time", "description": "Submission time" },
         "date": { "type": "string", "description": "Submission date (YYYY-MM-DD)" }
       },
-      "required": ["name", "phone", "storing", "space", "createdAt", "date"]
+      "required": ["name", "phone", "email", "storageNeeds", "userType", "createdAt", "date"]
     },
     "Mail": {
       "title": "Mail",

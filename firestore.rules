@@ -14,14 +14,14 @@ service cloud.firestore {
     }
 
     function isValidLead(data) {
-      return data.keys().hasAll(['name', 'phone', 'storing', 'space', 'createdAt', 'date']) &&
-             data.keys().hasOnly(['name', 'company', 'phone', 'email', 'storing', 'space', 'createdAt', 'date']) &&
+      return data.keys().hasAll(['name', 'phone', 'email', 'storageNeeds', 'userType', 'createdAt', 'date']) &&
+             data.keys().hasOnly(['name', 'phone', 'email', 'storageNeeds', 'userType', 'inquiry', 'createdAt', 'date']) &&
              data.name is string && data.name.size() > 0 && data.name.size() < 200 &&
              data.phone is string && data.phone.size() > 0 && data.phone.size() < 50 &&
-             (!('email' in data) || (data.email is string && data.email.size() > 0 && data.email.size() < 100)) &&
-             (!('company' in data) || (data.company is string && data.company.size() > 0 && data.company.size() < 200)) &&
-             data.storing is string && data.storing.size() > 0 && data.storing.size() < 50 &&
-             data.space is string && data.space.size() > 0 && data.space.size() < 50 &&
+             data.email is string && data.email.size() > 0 && data.email.size() < 100 &&
+             data.storageNeeds is string && data.storageNeeds.size() > 0 && data.storageNeeds.size() < 100 &&
+             data.userType is string && data.userType.size() > 0 && data.userType.size() < 50 &&
+             (!('inquiry' in data) || (data.inquiry is string && data.inquiry.size() > 0 && data.inquiry.size() < 2000)) &&
              data.createdAt is string && data.createdAt.size() > 0 &&
              data.date is string && data.date.size() > 0;
     }
