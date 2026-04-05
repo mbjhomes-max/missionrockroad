@@ -9,12 +9,31 @@ import { db } from './firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { backgroundImage } from './backgroundImage';
 
+declare global {
+  interface Window {
+    dataLayer: any[];
+    gtag: (...args: any[]) => void;
+  }
+}
+
 // Nominal change to test Firebase Hosting deployment via GitHub Actions
 
 export default function App() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const trackPhoneClick = () => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'contact', { method: 'phone' });
+    }
+  };
+
+  const trackEmailClick = () => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'contact', { method: 'email' });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -26,18 +45,13 @@ export default function App() {
     const data: Record<string, any> = {
       name: formData.get('name'),
       phone: formData.get('phone'),
-      storing: formData.get('storing'),
-      space: formData.get('space'),
+      email: formData.get('email'),
       createdAt: now.toISOString(),
-      date: now.toLocaleDateString('en-US'), // Added formatted date
+      date: now.toLocaleDateString('en-US'),
     };
 
-    // Only add optional fields if they are not empty strings
-    const company = formData.get('company');
-    if (company) data.company = company;
-    
-    const email = formData.get('email');
-    if (email) data.email = email;
+    const inquiry = formData.get('inquiry');
+    if (inquiry) data.inquiry = inquiry;
 
     try {
       await addDoc(collection(db, 'leads'), data);
@@ -46,19 +60,21 @@ export default function App() {
       await addDoc(collection(db, 'mail'), {
         to: ['815missionrockroad@gmail.com', 'mbjhomes@gmail.com'],
         message: {
-          subject: `New Lead: ${data.name} - Mission Rock Storage`,
+          subject: `New Grand Opening Lead: ${data.name} - Mission Rock Storage`,
           html: `
-            <h2>New Reservation Request</h2>
+            <h2>New Grand Opening Promotional Request</h2>
             <p><strong>Name:</strong> ${data.name}</p>
             <p><strong>Phone:</strong> ${data.phone}</p>
-            <p><strong>Email:</strong> ${data.email || 'Not provided'}</p>
-            <p><strong>Company:</strong> ${data.company || 'Not provided'}</p>
-            <p><strong>What are they storing:</strong> ${data.storing}</p>
-            <p><strong>Space needed:</strong> ${data.space}</p>
+            <p><strong>Email:</strong> ${data.email}</p>
+            <p><strong>Inquiry:</strong> ${data.inquiry || 'Not provided'}</p>
             <p><strong>Date Submitted:</strong> ${data.date}</p>
           `
         }
       });
+
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'generate_lead');
+      }
 
       setSubmitted(true);
     } catch (error) {
@@ -77,16 +93,13 @@ export default function App() {
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center">
               <span className="font-display font-bold text-2xl tracking-wider">
-                815 <span className="text-safety-orange">MISSION ROCK</span>
+                MISSION ROCK <span className="text-safety-orange">INDUSTRIAL CENTER</span>
               </span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              <a href="tel:8054500869" className="flex items-center hover:text-safety-orange transition-colors font-semibold">
+              <a href="tel:8054500869" onClick={trackPhoneClick} className="flex items-center hover:text-safety-orange transition-colors font-semibold">
                 <Phone className="w-5 h-5 mr-2 text-safety-orange" />
                 805.450.0869
-              </a>
-              <a href="#contact" className="bg-safety-orange hover:bg-safety-orange-hover text-white px-6 py-2 rounded font-display font-bold tracking-wide transition-colors">
-                GET A QUOTE
               </a>
             </div>
           </div>
@@ -106,34 +119,136 @@ export default function App() {
           <div className="absolute inset-0 bg-gradient-to-r from-charcoal-900 via-charcoal-900/80 to-transparent"></div>
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center px-3 py-1 rounded-full bg-safety-orange/20 border border-safety-orange text-safety-orange font-semibold text-sm mb-6">
-              <MapPin className="w-4 h-4 mr-2" />
-              815 Mission Rock Road Industrial Center
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="max-w-3xl">
+              <h1 className="text-5xl lg:text-7xl font-display font-bold leading-tight mb-6">
+                GRAND OPENING <br />
+                <span className="text-safety-orange">INDUSTRIAL STORAGE</span> <br />
+                & SEMI-TRUCK PARKING
+              </h1>
+              
+              <div className="flex flex-col sm:flex-row gap-6 mb-10">
+                <a href="tel:8054500869" onClick={trackPhoneClick} className="flex items-center text-2xl font-display font-bold hover:text-safety-orange transition-colors">
+                  <div className="bg-safety-orange/20 p-3 rounded-full mr-4">
+                    <Phone className="w-6 h-6 text-safety-orange" />
+                  </div>
+                  805.450.0869
+                </a>
+                <a href="mailto:815missionrockroad@gmail.com" onClick={trackEmailClick} className="flex items-center text-xl font-display font-bold hover:text-safety-orange transition-colors">
+                  <div className="bg-safety-orange/20 p-3 rounded-full mr-4">
+                    <Mail className="w-6 h-6 text-safety-orange" />
+                  </div>
+                  Email Us
+                </a>
+              </div>
+
+              <p className="text-xl text-zinc-300 mb-10 max-w-2xl leading-relaxed">
+                Your rugged, reliable partner for fleet parking, equipment staging, and bulk storage. 
+                Built for contractors, logistics, and heavy industry.
+              </p>
             </div>
-            <h1 className="text-5xl lg:text-7xl font-display font-bold leading-tight mb-6">
-              SECURE, HEAVY-DUTY <br />
-              <span className="text-safety-orange">INDUSTRIAL STORAGE</span> <br />
-              & YARD SPACE
-            </h1>
-            <p className="text-xl text-zinc-300 mb-10 max-w-2xl leading-relaxed">
-              Your rugged, reliable partner for fleet parking, equipment staging, and bulk storage. 
-              Built for contractors, logistics, and heavy industry.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <a href="#contact" className="bg-safety-orange hover:bg-safety-orange-hover text-white text-center px-8 py-4 rounded font-display font-bold text-lg tracking-wide transition-colors">
-                RESERVE YOUR SPACE
-              </a>
-              <a href="sms:8054500869" className="bg-white text-charcoal-900 hover:bg-zinc-200 text-center px-8 py-4 rounded font-display font-bold text-lg tracking-wide transition-colors flex items-center justify-center">
-                <MessageSquare className="w-5 h-5 mr-2" />
-                TAP TO TEXT US
-              </a>
-            </div>
-            <div className="mt-8">
-              <p className="text-zinc-400 font-medium">Visit us online at <a href="#" className="text-white underline decoration-safety-orange underline-offset-4">MissionRockStorage.com</a></p>
+
+            {/* Simplified Form */}
+            <div id="contact" className="bg-charcoal-900/95 backdrop-blur-sm p-8 rounded-lg shadow-2xl border-t-8 border-safety-orange">
+              {submitted ? (
+                <div className="text-center py-12">
+                  <ShieldCheck className="w-16 h-16 text-safety-orange mx-auto mb-6" />
+                  <h3 className="text-3xl font-display font-bold text-white mb-4">THANK YOU!</h3>
+                  <p className="text-zinc-300 text-lg">
+                    We've received your request and will be in touch shortly.
+                  </p>
+                  <button
+                    onClick={() => setSubmitted(false)}
+                    className="mt-8 bg-safety-orange hover:bg-safety-orange-hover text-white font-display font-bold text-lg tracking-wide py-3 px-6 rounded transition-colors"
+                  >
+                    SUBMIT ANOTHER REQUEST
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <h3 className="text-2xl font-display font-bold text-white mb-6">REQUEST GRAND OPENING PROMOTIONAL</h3>
+                  <form className="space-y-4" onSubmit={handleSubmit}>
+                    <div>
+                      <label htmlFor="name" className="block text-sm font-medium text-zinc-300 mb-1">Full Name *</label>
+                      <input 
+                        type="text" 
+                        id="name" 
+                        name="name"
+                        className="w-full bg-charcoal-800 border border-charcoal-700 rounded px-4 py-3 text-white focus:outline-none focus:border-safety-orange focus:ring-1 focus:ring-safety-orange transition-colors"
+                        placeholder="John Doe"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-zinc-300 mb-1">Email Address *</label>
+                      <input 
+                        type="email" 
+                        id="email" 
+                        name="email"
+                        className="w-full bg-charcoal-800 border border-charcoal-700 rounded px-4 py-3 text-white focus:outline-none focus:border-safety-orange focus:ring-1 focus:ring-safety-orange transition-colors"
+                        placeholder="john@example.com"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="phone" className="block text-sm font-medium text-zinc-300 mb-1">Phone Number *</label>
+                      <input 
+                        type="tel" 
+                        id="phone" 
+                        name="phone"
+                        className="w-full bg-charcoal-800 border border-charcoal-700 rounded px-4 py-3 text-white focus:outline-none focus:border-safety-orange focus:ring-1 focus:ring-safety-orange transition-colors"
+                        placeholder="(555) 123-4567"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="inquiry" className="block text-sm font-medium text-zinc-300 mb-1">Inquiry (Optional)</label>
+                      <textarea 
+                        id="inquiry" 
+                        name="inquiry"
+                        rows={3}
+                        className="w-full bg-charcoal-800 border border-charcoal-700 rounded px-4 py-3 text-white focus:outline-none focus:border-safety-orange focus:ring-1 focus:ring-safety-orange transition-colors"
+                        placeholder="Tell us about your storage needs..."
+                      ></textarea>
+                    </div>
+
+                    {submitError && (
+                      <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded text-sm">
+                        {submitError}
+                      </div>
+                    )}
+
+                    <button 
+                      type="submit" 
+                      disabled={isSubmitting}
+                      className="w-full bg-safety-orange hover:bg-safety-orange-hover text-white font-display font-bold text-lg tracking-wide py-4 rounded transition-colors mt-2 disabled:opacity-50"
+                    >
+                      {isSubmitting ? 'SUBMITTING...' : 'REQUEST PROMOTIONAL / REFERRAL FEE'}
+                    </button>
+                  </form>
+                </>
+              )}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Map Link Section */}
+      <section className="bg-charcoal-800 text-white py-6 border-b-4 border-safety-orange">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
+          <a 
+            href="https://maps.google.com/?q=815+Mission+Rock+Road,+Santa+Paula,+CA" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center text-xl hover:text-safety-orange transition-colors font-semibold"
+          >
+            <MapPin className="w-6 h-6 mr-3 text-safety-orange" />
+            815 Mission Rock Road, Santa Paula, CA
+          </a>
         </div>
       </section>
 
@@ -215,187 +330,12 @@ export default function App() {
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            
-            {/* Contact Info */}
-            <div>
-              <h2 className="text-4xl font-display font-bold text-charcoal-900 mb-6">LOCK IN YOUR SPACE TODAY</h2>
-              <p className="text-lg text-zinc-600 mb-10">
-                Industrial space at 815 Mission Rock Road is in high demand. Contact our team directly or fill out the form to get a custom quote for your storage needs.
-              </p>
-              
-              <div className="space-y-8">
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 bg-zinc-100 p-4 rounded-full">
-                    <Phone className="w-8 h-8 text-safety-orange" />
-                  </div>
-                  <div className="ml-6">
-                    <h4 className="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-1">Call Us</h4>
-                    <a href="tel:8054500869" className="text-2xl font-display font-bold text-charcoal-900 hover:text-safety-orange transition-colors">805.450.0869</a>
-                  </div>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 bg-zinc-100 p-4 rounded-full">
-                    <MessageSquare className="w-8 h-8 text-safety-orange" />
-                  </div>
-                  <div className="ml-6">
-                    <h4 className="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-1">Text Us</h4>
-                    <a href="sms:8054500869" className="text-2xl font-display font-bold text-charcoal-900 hover:text-safety-orange transition-colors">805.450.0869</a>
-                    <div className="mt-2">
-                      <a href="sms:8054500869" className="inline-flex items-center text-sm font-bold text-safety-orange hover:text-safety-orange-hover">
-                        TAP TO TEXT <MessageSquare className="w-4 h-4 ml-1" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 bg-zinc-100 p-4 rounded-full">
-                    <Mail className="w-8 h-8 text-safety-orange" />
-                  </div>
-                  <div className="ml-6">
-                    <h4 className="text-sm font-bold text-zinc-500 uppercase tracking-wider mb-1">Email Us</h4>
-                    <a href="mailto:815missionrockroad@gmail.com" className="text-xl font-bold text-charcoal-900 hover:text-safety-orange transition-colors break-all">815missionrockroad@gmail.com</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Lead Form */}
-            <div className="bg-charcoal-900 p-8 lg:p-10 rounded-lg shadow-xl border-t-8 border-safety-orange">
-              {submitted ? (
-                <div className="text-center py-12">
-                  <ShieldCheck className="w-16 h-16 text-safety-orange mx-auto mb-6" />
-                  <h3 className="text-3xl font-display font-bold text-white mb-4">THANK YOU!</h3>
-                  <p className="text-zinc-300 text-lg">
-                    We've received your request and will be in touch within 24 hours.
-                  </p>
-                  <button
-                    onClick={() => setSubmitted(false)}
-                    className="mt-8 bg-safety-orange hover:bg-safety-orange-hover text-white font-display font-bold text-lg tracking-wide py-3 px-6 rounded transition-colors"
-                  >
-                    SUBMIT ANOTHER REQUEST
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <h3 className="text-2xl font-display font-bold text-white mb-6">REQUEST A QUOTE</h3>
-                  <form className="space-y-6" onSubmit={handleSubmit}>
-                    <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-zinc-300 mb-2">Full Name *</label>
-                      <input 
-                        type="text" 
-                        id="name" 
-                        name="name"
-                        className="w-full bg-charcoal-800 border border-charcoal-700 rounded px-4 py-3 text-white focus:outline-none focus:border-safety-orange focus:ring-1 focus:ring-safety-orange transition-colors"
-                        placeholder="John Doe"
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <label htmlFor="company" className="block text-sm font-medium text-zinc-300 mb-2">Company Name</label>
-                      <input 
-                        type="text" 
-                        id="company" 
-                        name="company"
-                        className="w-full bg-charcoal-800 border border-charcoal-700 rounded px-4 py-3 text-white focus:outline-none focus:border-safety-orange focus:ring-1 focus:ring-safety-orange transition-colors"
-                        placeholder="Acme Construction"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="phone" className="block text-sm font-medium text-zinc-300 mb-2">Phone Number *</label>
-                      <input 
-                        type="tel" 
-                        id="phone" 
-                        name="phone"
-                        className="w-full bg-charcoal-800 border border-charcoal-700 rounded px-4 py-3 text-white focus:outline-none focus:border-safety-orange focus:ring-1 focus:ring-safety-orange transition-colors"
-                        placeholder="(555) 123-4567"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-zinc-300 mb-2">Email Address</label>
-                      <input 
-                        type="email" 
-                        id="email" 
-                        name="email"
-                        className="w-full bg-charcoal-800 border border-charcoal-700 rounded px-4 py-3 text-white focus:outline-none focus:border-safety-orange focus:ring-1 focus:ring-safety-orange transition-colors"
-                        placeholder="john@example.com"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="storing" className="block text-sm font-medium text-zinc-300 mb-2">What are you storing? *</label>
-                      <select 
-                        id="storing" 
-                        name="storing"
-                        className="w-full bg-charcoal-800 border border-charcoal-700 rounded px-4 py-3 text-white focus:outline-none focus:border-safety-orange focus:ring-1 focus:ring-safety-orange transition-colors appearance-none"
-                        required
-                        defaultValue=""
-                      >
-                        <option value="" disabled>Select an option</option>
-                        <option value="trucks">Trucks / Fleet Vehicles</option>
-                        <option value="equipment">Heavy Equipment</option>
-                        <option value="materials">Bulk Materials</option>
-                        <option value="containers">Shipping Containers</option>
-                        <option value="other">Other</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label htmlFor="space" className="block text-sm font-medium text-zinc-300 mb-2">Space Required *</label>
-                      <select 
-                        id="space" 
-                        name="space"
-                        className="w-full bg-charcoal-800 border border-charcoal-700 rounded px-4 py-3 text-white focus:outline-none focus:border-safety-orange focus:ring-1 focus:ring-safety-orange transition-colors appearance-none"
-                        required
-                        defaultValue=""
-                      >
-                        <option value="" disabled>Select an option</option>
-                        <option value="under-5k">Under 5,000 sq ft</option>
-                        <option value="5k-10k">5,000 - 10,000 sq ft</option>
-                        <option value="half-acre">1/2 Acre</option>
-                        <option value="one-plus-acre">1+ Acre</option>
-                      </select>
-                    </div>
-
-                    {submitError && (
-                      <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded text-sm">
-                        {submitError}
-                      </div>
-                    )}
-
-                    <button 
-                      type="submit" 
-                      disabled={isSubmitting}
-                      className="w-full bg-safety-orange hover:bg-safety-orange-hover text-white font-display font-bold text-lg tracking-wide py-4 rounded transition-colors mt-4 disabled:opacity-50"
-                    >
-                      {isSubmitting ? 'SUBMITTING...' : 'SUBMIT REQUEST'}
-                    </button>
-                    <p className="text-xs text-zinc-500 text-center mt-4">
-                      We'll get back to you within 24 hours with availability and pricing.
-                    </p>
-                  </form>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
+      {/* Services Section */}
       <footer className="bg-charcoal-900 border-t border-charcoal-800 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
           <div className="mb-6 md:mb-0 text-center md:text-left">
             <span className="font-display font-bold text-xl text-white tracking-wider block mb-2">
-              815 <span className="text-safety-orange">MISSION ROCK</span>
+              MISSION ROCK <span className="text-safety-orange">INDUSTRIAL CENTER</span>
             </span>
             <p className="text-zinc-400 text-sm">
               815 Mission Rock Road Industrial Center<br />
