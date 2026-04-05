@@ -293,7 +293,7 @@ export default function App() {
       <section className="bg-charcoal-800 text-white py-12 border-b-4 border-safety-orange">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
           <a 
-            href="https://maps.google.com/?q=815+Mission+Rock+Road,+Santa+Paula,+CA" 
+            href="https://maps.app.goo.gl/uLMCPTEERyLH5F1a6" 
             target="_blank" 
             rel="noopener noreferrer"
             className="flex items-center text-2xl hover:text-safety-orange transition-colors font-semibold mb-8"
@@ -309,7 +309,7 @@ export default function App() {
               scrolling="no" 
               marginHeight={0} 
               marginWidth={0} 
-              src="https://maps.google.com/maps?q=815+Mission+Rock+Road,+Santa+Paula,+CA&t=&z=14&ie=UTF8&iwloc=&output=embed"
+              src="https://maps.google.com/maps?q=Mission+Rock+Industrial+Center,+815+Mission+Rock+Road,+Santa+Paula,+CA&t=&z=14&ie=UTF8&iwloc=&output=embed"
               title="Mission Rock Location Map"
             ></iframe>
           </div>
