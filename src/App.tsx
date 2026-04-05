@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { MapPin, Phone, Mail, MessageSquare, Truck, HardHat, Package, ShieldCheck, Clock, FileText, Anchor } from 'lucide-react';
 import { db } from './firebase';
 import { collection, addDoc } from 'firebase/firestore';
@@ -22,6 +22,17 @@ export default function App() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const formRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (submitted && formRef.current) {
+      // Scroll slightly above the element to give it some breathing room
+      const yOffset = -80; 
+      const element = formRef.current;
+      const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  }, [submitted]);
 
   const trackPhoneClick = () => {
     if (typeof window !== 'undefined' && window.gtag) {
@@ -128,7 +139,7 @@ export default function App() {
             <div className="max-w-3xl">
               <h1 className="text-5xl lg:text-7xl font-display font-bold leading-tight mb-6">
                 GRAND OPENING <br />
-                <span className="text-safety-orange">INDUSTRIAL STORAGE</span> <br />
+                <span className="text-safety-orange">INDUSTRIAL OUTDOOR STORAGE (IOS)</span> <br />
                 & SEMI-TRUCK PARKING
               </h1>
               
@@ -157,7 +168,7 @@ export default function App() {
             </div>
 
             {/* Simplified Form */}
-            <div id="contact" className="bg-charcoal-900/95 backdrop-blur-sm p-8 rounded-lg shadow-2xl border-t-8 border-safety-orange">
+            <div id="contact" ref={formRef} className="bg-charcoal-900/95 backdrop-blur-sm p-8 rounded-lg shadow-2xl border-t-8 border-safety-orange">
               {submitted ? (
                 <div className="text-center py-12">
                   <ShieldCheck className="w-16 h-16 text-safety-orange mx-auto mb-6" />
@@ -279,17 +290,29 @@ export default function App() {
       </section>
 
       {/* Map Link Section */}
-      <section className="bg-charcoal-800 text-white py-6 border-b-4 border-safety-orange">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
+      <section className="bg-charcoal-800 text-white py-12 border-b-4 border-safety-orange">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
           <a 
             href="https://maps.google.com/?q=815+Mission+Rock+Road,+Santa+Paula,+CA" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="flex items-center text-xl hover:text-safety-orange transition-colors font-semibold"
+            className="flex items-center text-2xl hover:text-safety-orange transition-colors font-semibold mb-8"
           >
-            <MapPin className="w-6 h-6 mr-3 text-safety-orange" />
+            <MapPin className="w-8 h-8 mr-3 text-safety-orange" />
             Mission Rock Industrial Center & Truck Parking
           </a>
+          <div className="w-full h-[450px] rounded-lg overflow-hidden border-4 border-charcoal-700 shadow-2xl">
+            <iframe 
+              width="100%" 
+              height="100%" 
+              frameBorder="0" 
+              scrolling="no" 
+              marginHeight={0} 
+              marginWidth={0} 
+              src="https://maps.google.com/maps?q=815+Mission+Rock+Road,+Santa+Paula,+CA&t=&z=14&ie=UTF8&iwloc=&output=embed"
+              title="Mission Rock Location Map"
+            ></iframe>
+          </div>
         </div>
       </section>
 
@@ -371,7 +394,71 @@ export default function App() {
         </div>
       </section>
 
-      {/* Services Section */}
+      {/* Build to Suit Section */}
+      <section className="py-20 bg-charcoal-900 text-white border-b-4 border-safety-orange">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-4xl font-display font-bold mb-6">BUILD TO SUIT</h2>
+              <div className="w-24 h-1 bg-safety-orange mb-8"></div>
+              <p className="text-xl text-zinc-300 mb-6 leading-relaxed">
+                Need a custom solution? We offer comprehensive Build to Suit options tailored specifically to your operational requirements.
+              </p>
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-start">
+                  <div className="bg-safety-orange/20 p-2 rounded mr-4 mt-1">
+                    <Package className="w-5 h-5 text-safety-orange" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-lg">Custom Warehouses</h4>
+                    <p className="text-zinc-400">Purpose-built structures for your inventory and logistics.</p>
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <div className="bg-safety-orange/20 p-2 rounded mr-4 mt-1">
+                    <Truck className="w-5 h-5 text-safety-orange" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-lg">Electric Fleet Charging Facilities</h4>
+                    <p className="text-zinc-400">Future-proof your operations with dedicated EV charging infrastructure.</p>
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <div className="bg-safety-orange/20 p-2 rounded mr-4 mt-1">
+                    <HardHat className="w-5 h-5 text-safety-orange" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-lg">Specialized Facilities</h4>
+                    <p className="text-zinc-400">Maintenance bays, cross-docking, and specialized industrial setups.</p>
+                  </div>
+                </li>
+              </ul>
+              <button 
+                onClick={() => {
+                  const contactForm = document.getElementById('contact');
+                  if (contactForm) {
+                    contactForm.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className="bg-transparent border-2 border-safety-orange text-safety-orange hover:bg-safety-orange hover:text-white font-display font-bold text-lg tracking-wide py-3 px-8 rounded transition-colors"
+              >
+                DISCUSS YOUR PROJECT
+              </button>
+            </div>
+            <div className="relative h-[500px] rounded-lg overflow-hidden shadow-2xl border-4 border-charcoal-800">
+              <img 
+                src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070&auto=format&fit=crop" 
+                alt="Industrial Warehouse Construction" 
+                className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-charcoal-900/80 to-transparent"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer Section */}
       <footer className="bg-charcoal-900 border-t border-charcoal-800 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
           <div className="mb-6 md:mb-0 text-center md:text-left">
