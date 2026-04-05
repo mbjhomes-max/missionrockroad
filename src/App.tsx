@@ -46,6 +46,8 @@ export default function App() {
       name: formData.get('name'),
       phone: formData.get('phone'),
       email: formData.get('email'),
+      storageNeeds: formData.get('storageNeeds'),
+      userType: formData.get('userType'),
       createdAt: now.toISOString(),
       date: now.toLocaleDateString('en-US'),
     };
@@ -66,6 +68,8 @@ export default function App() {
             <p><strong>Name:</strong> ${data.name}</p>
             <p><strong>Phone:</strong> ${data.phone}</p>
             <p><strong>Email:</strong> ${data.email}</p>
+            <p><strong>Storage Needs:</strong> ${data.storageNeeds || 'Not provided'}</p>
+            <p><strong>User Type:</strong> ${data.userType || 'Not provided'}</p>
             <p><strong>Inquiry:</strong> ${data.inquiry || 'Not provided'}</p>
             <p><strong>Date Submitted:</strong> ${data.date}</p>
           `
@@ -143,9 +147,12 @@ export default function App() {
                 </a>
               </div>
 
-              <p className="text-xl text-zinc-300 mb-10 max-w-2xl leading-relaxed">
+              <p className="text-xl text-zinc-300 mb-6 max-w-2xl leading-relaxed">
                 Your rugged, reliable partner for fleet parking, equipment staging, and bulk storage. 
                 Built for contractors, logistics, and heavy industry.
+              </p>
+              <p className="text-xl text-safety-orange font-semibold mb-10 max-w-2xl leading-relaxed">
+                Make sure you register to be notified of all our grand opening events and promotions.
               </p>
             </div>
 
@@ -206,6 +213,40 @@ export default function App() {
                     </div>
 
                     <div>
+                      <label htmlFor="storageNeeds" className="block text-sm font-medium text-zinc-300 mb-1">Storage Needs *</label>
+                      <select 
+                        id="storageNeeds" 
+                        name="storageNeeds"
+                        className="w-full bg-charcoal-800 border border-charcoal-700 rounded px-4 py-3 text-white focus:outline-none focus:border-safety-orange focus:ring-1 focus:ring-safety-orange transition-colors appearance-none"
+                        required
+                        defaultValue=""
+                      >
+                        <option value="" disabled>Select an option</option>
+                        <option value="Semi-Truck Parking">Semi-Truck Parking</option>
+                        <option value="Electric Fleet Charging">Electric Fleet Charging</option>
+                        <option value="Bulk Material Storage">Bulk Material Storage</option>
+                        <option value="Shipping Container Storage">Shipping Container Storage</option>
+                        <option value="Heavy Equipment Storage">Heavy Equipment Storage</option>
+                        <option value="Referral Program">Referral Program</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-zinc-300 mb-2">I am a: *</label>
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        <label className="flex items-center">
+                          <input type="radio" name="userType" value="Primary User" className="mr-2 text-safety-orange focus:ring-safety-orange" required />
+                          <span className="text-zinc-300">Primary User</span>
+                        </label>
+                        <label className="flex items-center">
+                          <input type="radio" name="userType" value="Referral Program" className="mr-2 text-safety-orange focus:ring-safety-orange" required />
+                          <span className="text-zinc-300">Referral Program</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div>
                       <label htmlFor="inquiry" className="block text-sm font-medium text-zinc-300 mb-1">Inquiry (Optional)</label>
                       <textarea 
                         id="inquiry" 
@@ -247,7 +288,7 @@ export default function App() {
             className="flex items-center text-xl hover:text-safety-orange transition-colors font-semibold"
           >
             <MapPin className="w-6 h-6 mr-3 text-safety-orange" />
-            815 Mission Rock Road, Santa Paula, CA
+            Mission Rock Industrial Center & Truck Parking
           </a>
         </div>
       </section>
